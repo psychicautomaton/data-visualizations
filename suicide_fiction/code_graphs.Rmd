@@ -1,0 +1,305 @@
+---
+title: "final_project"
+output: html_document
+---
+
+```{r}
+library(tidyverse)
+library(hrbrthemes)
+library(ggrepel)
+hrbrthemes::import_roboto_condensed()
+setwd('/Users/umadwivedi/Documents/Projects/YALE/senior/s1/PLSC 349 — data visualization/final_project')
+```
+
+
+
+```{r}
+suicide <- read.csv('dwivedi_suicidedata.csv')
+```
+
+```{r}
+
+suicide <- suicide %>%
+  mutate(char = factor(char, 
+                       levels = c("anna", "edna", "emma", "hamlet", "septimus", "werther"),
+                       labels = c("Anna Karenina", "Edna Pontellier (The Awakening)", "Emma Bovary (Madame Bovary)", "Prince Hamlet", "Septimus Smith (Mrs. Dalloway)", "Werther (Sorrows of Young Werther)")))
+
+```
+
+```{r}
+p <- ggplot(suicide, aes(x=time, y=closeness_isolation, col=despair)) +
+  geom_path(aes(size=passivity_agency),lineend="round") +
+  facet_wrap(~char, labeller = label_wrap_gen(18)) + 
+  theme_ft_rc() +
+  scale_color_continuous(low="deeppink3", high="deepskyblue4", 
+                         guide=guide_colorbar(title="Level of Despair", nbin=40),
+                         breaks=c(3,10), labels=c("ecstasy", "abjection")) +
+  theme(axis.text.x = element_blank(),
+        axis.text.y=element_text(size=rel(1.3)),
+        axis.title.x=element_text(color="deeppink3", size=rel(1.75)),
+        axis.title.y=element_text(color="deeppink3", size=rel(1.75)),
+        legend.title = element_text(size=rel(1.5), color = "white"),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        legend.text = element_text(size=rel(1.3)),
+        strip.text = element_text(color = "white", size = rel(1.3))) +
+  ylab("Interdependence vs. Independence") +
+  xlab("Time") +
+  scale_size_continuous(breaks=c(.05,.5),
+                        labels=c("subservience","self-sovereignty")) +
+  labs(title="Trajectories of Suicidal Characters in Fiction", size="Passivity vs. Agency") +
+  scale_y_continuous(breaks=c(-4, 7),
+                     labels=c("closeness", "isolation"))
+
+
+ggsave('suicide_trajectories.png', p, width=20, height=9)
+  
+```
+
+```{r}
+
+anna_events <- c("", "leaving son behind", "meeting Vronsky on train", 
+                 "meeting Kitty/attending ball", "leaving ball", 
+                 "Vronsky declares love", "going home", "meeting Betsy",
+                 "begins affair", "husband suspects affair", 
+                 "pregnant w/ V's baby", "V's accident/confessing affair",
+                 "husband threatens to take son away", "affair continues", 
+                 "husband considers divorce", "difficult birth", "husband's forgiveness",
+                 "V attempts suicide", "wants to leave",
+                 "V about to leave", "elopement", "social alienation", 
+                 "marital issues", "","sleep in separate rooms", "leave for country home",
+                 "alienation from Betsy", "extramarital flirting", "jealousy",
+                 "needs marriage to V", "V leaves for moscow", "taking in English orphan",
+                 "Levin falls for Anna", "strain w/ V", "morphine addiction", 
+                 "jealousy", "suicidality", "asks V to return/refusal", "suicide")
+
+
+p <- ggplot(subset(suicide, char == "Anna Karenina"), aes(x=time, y=closeness_isolation, col=despair)) +
+  geom_path(aes(size=passivity_agency),lineend="round") +
+  #facet_wrap(~char, labeller = label_wrap_gen(18)) + 
+  theme_ft_rc() +
+  scale_color_continuous(low="deeppink3", high="deepskyblue4", 
+                         guide=guide_colorbar(title="Level of Despair", nbin=40),
+                         breaks=c(3,10), labels=c("ecstasy", "abjection")) +
+  theme(plot.title = element_text(size=rel(3)),
+        axis.text.x = element_blank(),
+        axis.text.y=element_text(size=rel(2.3)),
+        axis.title.x=element_text(color="deeppink3", size=rel(2.3)),
+        axis.title.y=element_text(color="deeppink3", size=rel(2.3)),
+        legend.title = element_text(size=rel(2.5), color = "white"),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        #strip.text = element_text(color = "white", size = rel(1.3)),
+        legend.text = element_text(size=rel(2))) +
+  ylab("Interdependence vs. Independence") +
+  xlab("Time") +
+  scale_size_continuous(breaks=c(.05,.3),
+                        labels=c("subservience","self-sovereignty")) +
+  labs(title="Trajectories of Suicidal Characters in Fiction: Anna Karenina", size="Passivity vs. Agency") +
+  scale_y_continuous(breaks=c(-4, 7),
+                     labels=c("closeness", "isolation")) +
+  geom_point() +
+  geom_text_repel(label=str_wrap(anna_events, width=18), col="white") 
+
+ggsave('anna_traj.png', p, width=20, height=15)
+```
+
+```{r}
+edna_events <- c("", "vacation/time w/ Adele", "affair w/ Robert", "Robert leaves",
+                 "return to New Orleans/self-isolation", "husband worries", 
+                 "home alone", "affair w/ Arobin", "affair ends", 
+                 "meet Madame Reisz", "affair w/ Robert", "assist w/ Adele's birth",
+                 "Robert leaves", "suicide", "")
+
+
+p <- ggplot(subset(suicide, char == "Edna Pontellier (The Awakening)"), aes(x=time, y=closeness_isolation, col=despair)) +
+  geom_path(aes(size=passivity_agency),lineend="round") +
+  #facet_wrap(~char, labeller = label_wrap_gen(18)) + 
+  theme_ft_rc() +
+  scale_color_continuous(low="deeppink3", high="deepskyblue4", 
+                         guide=guide_colorbar(title="Level of Despair", nbin=40),
+                         breaks=c(4,9), labels=c("ecstasy", "abjection")) +
+  theme(plot.title = element_text(size=rel(3)),
+        axis.text.x = element_blank(),
+        axis.text.y=element_text(size=rel(2.3)),
+        axis.title.x=element_text(color="deeppink3", size=rel(2.3)),
+        axis.title.y=element_text(color="deeppink3", size=rel(2.3)),
+        legend.title = element_text(size=rel(2.5), color = "white"),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        #strip.text = element_text(color = "white", size = rel(1.3)),
+        legend.text = element_text(size=rel(2))) +
+  ylab("Interdependence vs. Independence") +
+  xlab("Time") +
+  scale_size_continuous(breaks=c(.05,.3),
+                        labels=c("subservience","self-sovereignty")) +
+  labs(title="Trajectories of Suicidal Characters in Fiction: Edna Pontellier (The Awakening)", size="Passivity vs. Agency") +
+  scale_y_continuous(breaks=c(-4, 7),
+                     labels=c("closeness", "isolation")) +
+    geom_text_repel(label=str_wrap(edna_events, width=18), col="white") 
+
+
+
+ggsave('dwivedi_edna_traj.png', p, width=20, height=15)
+```
+
+
+```{r}
+emma_events <- c("","","Charles takes interest","marriage to Charles", 
+                 "dissatisfaction w/ marriage", "move to bigger town",
+                 "has daughter", "dissatisfaction w/ motherhood",
+                 "meets Leon/doesn't act on it", "Leon leaves",
+                 "affair w/ Rodolphe", "Rodolphe leaves/illness",
+                 "meets Leon again", "affair w/ Leon", "relationship deteriorates", "increasing apathy from L",
+                 "descent into debt","refused help", "suicide")
+
+p <- ggplot(subset(suicide, char == "Emma Bovary (Madame Bovary)"), aes(x=time, y=closeness_isolation, col=despair)) +
+  geom_path(aes(size=passivity_agency),lineend="round") +
+  #facet_wrap(~char, labeller = label_wrap_gen(18)) + 
+  theme_ft_rc() +
+  scale_color_continuous(low="deeppink3", high="deepskyblue4", 
+                         guide=guide_colorbar(title="Level of Despair", nbin=40),
+                         breaks=c(3,10), labels=c("ecstasy", "abjection")) +
+  theme(plot.title = element_text(size=rel(3)),
+        axis.text.x = element_blank(),
+        axis.text.y=element_text(size=rel(2.3)),
+        axis.title.x=element_text(color="deeppink3", size=rel(2.3)),
+        axis.title.y=element_text(color="deeppink3", size=rel(2.3)),
+        legend.title = element_text(size=rel(2.5), color = "white"),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        #strip.text = element_text(color = "white", size = rel(1.3)),
+        legend.text = element_text(size=rel(2))) +
+  ylab("Interdependence vs. Independence") +
+  xlab("Time") +
+  scale_size_continuous(breaks=c(.05,.3),
+                        labels=c("subservience","self-sovereignty")) +
+  labs(title="Trajectories of Suicidal Characters in Fiction: Emma Bovary (Madame Bovary)", size="Passivity vs. Agency") +
+  scale_y_continuous(breaks=c(-4, 7),
+                     labels=c("closeness", "isolation")) +
+  geom_text_repel(label=str_wrap(emma_events, width=18), col="white") 
+
+
+
+ggsave('dwivedi_emma_traj.png', p, width=20, height=15)
+```
+
+
+```{r}
+
+ham_events <- c("","","scolding", "forbidden to leave home",
+                "reunion w/ Horatio", "sees father's ghost",
+                "confusion about what to do", 
+                "reunion w/ Ophelia", "Rozencrantz & Guildenstern come",
+                "suspicion about R & G's motives", "actors come to town",
+                "'to be or not to be' and 'get thee to a nunnery'", 
+                "play w/in a play", "King shows guilt", 
+                "talks to Gertrude", "spares King as he prays",
+                "mistakenly kills Polonius", "jokes about murder",
+                "O and Laertes grieve","King plots to murder Hamlet",
+                "escapes", "O dies", "reunion w/ Horatio", 
+                "'alas, dear Yorick'", "O's funeral/fight challenge", "talk w/ Horatio", "fight", "Gertrude is poisoned",
+                "death")
+
+p <- ggplot(subset(suicide, char == "Prince Hamlet"), aes(x=time, y=closeness_isolation, col=despair)) +
+  geom_path(aes(size=passivity_agency),lineend="round") +
+  #facet_wrap(~char, labeller = label_wrap_gen(18)) + 
+  theme_ft_rc() +
+  scale_color_continuous(low="deeppink3", high="deepskyblue4", 
+                         guide=guide_colorbar(title="Level of Despair", nbin=40),
+                         breaks=c(5,9), labels=c("ecstasy", "abjection")) +
+  theme(plot.title = element_text(size=rel(3)),
+        axis.text.x = element_blank(),
+        axis.text.y=element_text(size=rel(2.3)),
+        axis.title.x=element_text(color="deeppink3", size=rel(2.3)),
+        axis.title.y=element_text(color="deeppink3", size=rel(2.3)),
+        legend.title = element_text(size=rel(2.5), color = "white"),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        #strip.text = element_text(color = "white", size = rel(1.3)),
+        legend.text = element_text(size=rel(2))) +
+  ylab("Interdependence vs. Independence") +
+  xlab("Time") +
+  scale_size_continuous(breaks=c(.05,.3),
+                        labels=c("subservience","self-sovereignty")) +
+  labs(title="Trajectories of Suicidal Characters in Fiction: Hamlet", size="Passivity vs. Agency") +
+  scale_y_continuous(breaks=c(-4, 7),
+                     labels=c("closeness", "isolation")) +
+  geom_text_repel(label=str_wrap(ham_events, width=18), col="white") 
+
+
+
+ggsave('hamlet_traj.png', p, width=20, height=15)
+```
+
+
+```{r}
+sep_events <- c("", "sitting in regent park w/ Rezia", "visit Dr. Holmes & Sir Williams", "told he will be sent away", "time in apartment w/ R", "Dr. Holmes comes to take him away", "suicide", "")
+
+
+p <- ggplot(subset(suicide, char == "Septimus Smith (Mrs. Dalloway)"), aes(x=time, y=closeness_isolation, col=despair)) +
+  geom_path(aes(size=passivity_agency),lineend="round") +
+  #facet_wrap(~char, labeller = label_wrap_gen(18)) + 
+  theme_ft_rc() +
+  scale_color_continuous(low="deeppink3", high="deepskyblue4", 
+                         guide=guide_colorbar(title="Level of Despair", nbin=40),
+                         breaks=c(6,10), labels=c("ecstasy", "abjection")) +
+  theme(plot.title = element_text(size=rel(3)),
+        axis.text.x = element_blank(),
+        axis.text.y=element_text(size=rel(2.3)),
+        axis.title.x=element_text(color="deeppink3", size=rel(2.3)),
+        axis.title.y=element_text(color="deeppink3", size=rel(2.3)),
+        legend.title = element_text(size=rel(2.5), color = "white"),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        #strip.text = element_text(color = "white", size = rel(1.3)),
+        legend.text = element_text(size=rel(2))) +
+  ylab("Interdependence vs. Independence") +
+  xlab("Time") +
+  scale_size_continuous(breaks=c(.05,.3),
+                        labels=c("subservience","self-sovereignty")) +
+  labs(title="Trajectories of Suicidal Characters in Fiction: Septimus Smith (Mrs. Dalloway)", size="Passivity vs. Agency") +
+  scale_y_continuous(breaks=c(-4, 7),
+                     labels=c("closeness", "isolation")) + 
+  geom_text_repel(label=str_wrap(sep_events, width=18), col="white") 
+
+ggsave('dwivedi_septimus_traj.png', p, width=20, height=15)
+```
+
+
+```{r}
+wer_events <- c("", "","meeting Charlotte & falling in love", "leaving",
+                "meeting Von B", "embarrassment at friend's",
+                "returning to Charlotte", 
+                "Charlotte and Albert are married",
+                "final visit with Charlotte", "suicide")
+p <- ggplot(subset(suicide, char == "Werther (Sorrows of Young Werther)"), aes(x=time, y=closeness_isolation, col=despair)) +
+  geom_path(aes(size=passivity_agency),lineend="round") +
+  #facet_wrap(~char, labeller = label_wrap_gen(18)) + 
+  theme_ft_rc() +
+  scale_color_continuous(low="deeppink3", high="deepskyblue4", 
+                         guide=guide_colorbar(title="Level of Despair", nbin=40),
+                         breaks=c(4,10), labels=c("ecstasy", "abjection")) +
+  theme(plot.title = element_text(size=rel(3)),
+        axis.text.x = element_blank(),
+        axis.text.y=element_text(size=rel(2.3)),
+        axis.title.x=element_text(color="deeppink3", size=rel(2.3)),
+        axis.title.y=element_text(color="deeppink3", size=rel(2.3)),
+        legend.title = element_text(size=rel(2.5), color = "white"),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        #strip.text = element_text(color = "white", size = rel(1.3)),
+        legend.text = element_text(size=rel(2))) +
+  ylab("Interdependence vs. Independence") +
+  xlab("Time") +
+  scale_size_continuous(breaks=c(.1,.4),
+                        labels=c("subservience","self-sovereignty")) +
+  labs(title="Trajectories of Suicidal Characters in Fiction: Werther (Sorrows of Young Werther)", size="Passivity vs. Agency") +
+  scale_y_continuous(breaks=c(-4, 7),
+                     labels=c("closeness", "isolation")) +
+  geom_text_repel(label=str_wrap(wer_events, width=18), col="white") 
+
+
+ggsave('dwivedi_werther_traj.png', p, width=20, height=15)
+```
+
